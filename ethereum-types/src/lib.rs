@@ -17,6 +17,7 @@ extern crate serde;
 
 #[cfg(test)]
 extern crate serde_json;
+extern crate parity_codec as codec;
 
 mod hash;
 mod uint;

@@ -42,6 +42,7 @@ extern crate ethereum_types_serialize;
 
 #[cfg(feature="serialize")]
 extern crate serde;
+extern crate parity_codec as codec;
 
 #[cfg(test)]
 #[macro_use]
@@ -61,6 +62,24 @@ const BLOOM_BITS: u32 = 3;
 const BLOOM_SIZE: usize = 256;
 
 construct_hash!(Bloom, BLOOM_SIZE);
+
+impl ::codec::Encode for Bloom {
+    fn using_encoded<R, F: FnOnce(&[u8]) -> R>(&self, f: F) -> R {
+        self.data().using_encoded(f)
+    }
+}
+impl ::codec::Decode for Bloom {
+    fn decode<I: ::codec::Input>(input: &mut I) -> Option<Self> {
+        let mut buf = Vec::new();
+        let size = input.read(&mut buf);
+        if size != 256 {
+            None
+        } else {
+            Some(Bloom::from_slice(&buf))
+        }
+    }
+}
+
 
 /// Returns log2.
 fn log2(x: usize) -> u32 {
