@@ -70,7 +70,7 @@ impl ::codec::Encode for Bloom {
 }
 impl ::codec::Decode for Bloom {
     fn decode<I: ::codec::Input>(input: &mut I) -> Option<Self> {
-        let mut buf = Vec::new();
+        let mut buf: [u8; 256] = [0; 256];
         let size = input.read(&mut buf);
         if size != 256 {
             None
@@ -277,6 +277,7 @@ impl<'de> Deserialize<'de> for Bloom {
 #[cfg(test)]
 mod tests {
 	use {Bloom, Input};
+    use codec::{Encode, Decode};
 
 	#[test]
 	fn it_works() {
@@ -297,4 +298,10 @@ mod tests {
 		assert!(my_bloom.contains_input(Input::Raw(&topic)));
 		assert_eq!(my_bloom, bloom);
 	}
+
+    #[test]
+    fn codec_decode_and_encode_bloom() {
+        let bloom = Bloom::default();
+        let decode_bloom = Bloom::decode(&mut bloom.encode().as_slice()).unwrap();
+    }
 }
